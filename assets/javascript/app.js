@@ -1,5 +1,5 @@
 // Initialize Firebase
-var config = {
+let config = {
     apiKey: "AIzaSyDkzgePzwnfeMNxusbK89JKnuarexpub_M",
     authDomain: "rps-multiplayer-74bcc.firebaseapp.com",
     databaseURL: "https://rps-multiplayer-74bcc.firebaseio.com",
@@ -29,12 +29,12 @@ let database = firebase.database();
 // -------------------------------------------------------------- (CRITICAL - BLOCK) --------------------------- //
 // connectionsRef references a specific location in our database.
 // All of our connections will be stored in this directory.
-var connectionsRef = database.ref("/connections");
+let connectionsRef = database.ref("/connections");
 
 // '.info/connected' is a special location provided by Firebase that is updated every time
 // the client's connection state changes.
 // '.info/connected' is a boolean value, true if the client is connected and false if they are not.
-var connectedRef = database.ref(".info/connected");
+let connectedRef = database.ref(".info/connected");
 
 // When the client's connection state changes...
 connectedRef.on("value", function(snap) {
@@ -43,7 +43,7 @@ connectedRef.on("value", function(snap) {
   if (snap.val()) {
 
     // Add user to the connections list.
-    var con = connectionsRef.push(true);
+    let con = connectionsRef.push(true);
 
     // Remove user from the connection list when they disconnect.
     con.onDisconnect().remove();
