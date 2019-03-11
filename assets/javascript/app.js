@@ -68,3 +68,40 @@ connectionsRef.on("value", function(snapshot) {
 });
 
 // -------------------------------------------------------------- (CRITICAL - BLOCK) --------------------------- //
+let name = "player-1";
+let player = database.ref("users/" + name);
+
+let listElements = document.getElementsByTagName("li");
+
+// console.log(listElements);
+
+// console.log(listElements.length);
+
+for (i=0; i < listElements.length; i++) {
+    // console.log(i);
+
+    let element = listElements.item(i);
+
+    // console.log(element);
+
+    element.addEventListener("click", () => {
+
+        let choice = element.getAttribute("data-value");
+
+        console.log(choice);
+
+        // save choice to database
+        player.set({
+            choice: choice
+        })
+
+        // save choice to database
+        // wait for another choice
+
+        // or 
+
+        // check database for choice
+        // if choice exists, compare to current choice
+        // determine a winner
+    });
+}

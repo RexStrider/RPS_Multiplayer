@@ -1,0 +1,11 @@
+li {
+    font-size: 16px;
+    margin: 10px 0px 10px 0px;
+    padding: 5px;
+}
+
+li:hover {
+    background-color: yellow;
+    border: 2px solid black;
+    cursor: pointer;
+}
