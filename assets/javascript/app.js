@@ -1,12 +1,12 @@
 // Initialize Firebase
-let config = {
+var config = {
     apiKey: "AIzaSyDkzgePzwnfeMNxusbK89JKnuarexpub_M",
     authDomain: "rps-multiplayer-74bcc.firebaseapp.com",
     databaseURL: "https://rps-multiplayer-74bcc.firebaseio.com",
     projectId: "rps-multiplayer-74bcc",
-    storageBucket: "",
+    storageBucket: "rps-multiplayer-74bcc.appspot.com",
     messagingSenderId: "1028361656334"
-  };
+};
 
 firebase.initializeApp(config);
 
@@ -16,11 +16,11 @@ let database = firebase.database();
 
 // * Only two users can play at the same time.
 
-// * Both players pick either `rock`, `paper` or `scissors`. After the players make their selection, the game will tell them whether a tie occurred or if one player defeated the other.
+// * Both playerReferences pick either `rock`, `paper` or `scissors`. After the playerReferences make their selection, the game will tell them whether a tie occurred or if one playerReference defeated the other.
 
-// * The game will track each player's wins and losses.
+// * The game will track each playerReference's wins and losses.
 
-// * Throw some chat functionality in there! No online multiplayer game is complete without having to endure endless taunts and insults from your jerk opponent.
+// * Throw some chat functionality in there! No online multiplayerReference game is complete without having to endure endless taunts and insults from your jerk opponent.
 
 // * Styling and theme are completely up to you. Get Creative!
 
@@ -51,95 +51,190 @@ connectedRef.on("value", snap => {
 });
 
 // When first loaded or when the connections list changes...
-connectionsRef.on("value", snapshot => {
+let firebaseConnectionEstablished = new Promise( (resolve, reject) => {
+    connectionsRef.on("value", snapshot => {
 
-  // Display the viewer count in the html.
-  // The number of online users is the number of children in the connections list.
-
-    let num = snapshot.numChildren();
-
-    if (num === 1) {
-        document.getElementById("watchers").textContent = num + " person is watching";
-    }
-    else {
-        document.getElementById("watchers").textContent = num + " people are watching";
-    }
-    
+        // Display the viewer count in the html.
+        // The number of online users is the number of children in the connections list.
+      
+          let num = snapshot.numChildren();
+      
+          if (num === 1) {
+              document.getElementById("watchers").textContent = num + " person is watching";
+          }
+          else {
+              document.getElementById("watchers").textContent = num + " people are watching";
+          }
+          
+          resolve(num);
+      });
+}).catch( error => {
+    console.log("error ocurred during the promise, firebase connection established")
+    console.log(error);
 });
 
 // -------------------------------------------------------------- (CRITICAL - BLOCK) --------------------------- //
-let player;
+let playerReference;
 let name = prompt("What's your name?");
 while (name === "" || name === null) {
     name = prompt("Give me a proper name!");
 }
-ensureUniquePlayerName(name);
 
-
-
-
-let listElements = document.getElementsByTagName("li");
-
-for (i=0; i < listElements.length; i++) {
-
-    let element = listElements.item(i);
-    element.addEventListener("click", () => {
-
-        let choice = element.getAttribute("data-value");
-
-        console.log(choice);
-
-        // save choice to database
-        player.set({
-            name: name,
-            choice: choice
-        }).then(() => {
-
-            let users = database.ref("users");
-
-            console.log(users);
-            // console.log(users.val());
-            users.on("value", snapshot => {
-                console.log(snapshot.val());
-            })
-
-            // users.once("value", snapshot => {
-
-            // })
-
-        })
-
-        // save choice to database
-        // wait for another choice
-
-        // or 
-
-        // check database for choice
-        // if choice exists, compare to current choice
-        // determine a winner
+firebaseConnectionEstablished.then( num => {
+    let playerIsSet = new Promise((resolve, reject) => {
+        setPlayer(name, num);
+        resolve();
     });
-}
-
-function ensureUniquePlayerName(name) {
-    player = database.ref("users/" + name);
-    player.once("value", snapshot => {
-        if (snapshot.exists()) {
-            name = prompt("That player already exists, enter a new name");
-            while (name === "" || name === null) {
-                name = prompt("If you want to play the game, then you must enter a name");
-            }
-            ensureUniquePlayerName(name);
-        }
-        else {
-
-            player.set({
-                name: name
-            });
-            player.onDisconnect().remove();
-        }
     
+    playerIsSet.then( () => {
+        let listElements = document.getElementsByTagName("li");
+
+        for (i=0; i < listElements.length; i++) {
+
+            let element = listElements.item(i);
+            element.addEventListener("click", () => {
+
+                let choice = element.getAttribute("data-value");
+
+                console.log(choice);
+
+                // save choice to database
+                playerReference.set({
+                    name: name,
+                    choice: choice
+                }).then(() => {
+
+                    let users = database.ref("users");
+
+                    console.log(users);
+                    // console.log(users.val());
+                    users.on("value", snapshot => {
+                        console.log(snapshot);
+
+                        console.log(snapshot.val());
+
+                        // let playerReferences = snapshot.val();
+
+                        if (num > 1) {
+                            console.log("we have a challenger");
+                        }
+                        else {
+                            console.log("wating for a challenger...");
+                        }
+                    })
+
+                    // users.once("value", snapshot => {
+
+                    // })
+
+                })
+
+                // save choice to database
+                // wait for another choice
+
+                // or 
+
+                // check database for choice
+                // if choice exists, compare to current choice
+                // determine a winner
+            });
+        }
+    }).catch( error => {
+        console.log("an error ocurred during the promise, the player is set");
+        console.log(error);
+    });
+    
+});
+
+
+// players.push(name);
+
+
+
+// let listElements = document.getElementsByTagName("li");
+
+// for (i=0; i < listElements.length; i++) {
+
+//     let element = listElements.item(i);
+//     element.addEventListener("click", () => {
+
+//         let choice = element.getAttribute("data-value");
+
+//         console.log(choice);
+
+//         // save choice to database
+//         playerReference.set({
+//             name: name,
+//             choice: choice
+//         }).then(() => {
+
+//             let users = database.ref("users");
+
+//             console.log(users);
+//             // console.log(users.val());
+//             users.on("value", snapshot => {
+//                 console.log(snapshot);
+
+//                 console.log(snapshot.val());
+
+//                 let playerReferences = snapshot.val();
+
+//                 if (playerReference.length > 1) {
+//                     console.log("we have a challenger");
+//                 }
+//                 else {
+//                     console.log("wating for a challenger...");
+//                 }
+//             })
+
+//             // users.once("value", snapshot => {
+
+//             // })
+
+//         })
+
+//         // save choice to database
+//         // wait for another choice
+
+//         // or 
+
+//         // check database for choice
+//         // if choice exists, compare to current choice
+//         // determine a winner
+//     });
+// }
+
+function setPlayer(name, num) {
+    playerReference = database.ref("users/player-"+num);
+
+    playerReference.set({
+        name: name
     }).catch(error => {
         console.log("Uh oh... there has been an error");
         console.log(error);
     });
+
+    playerReference.onDisconnect().remove();
+
+    // playerReference.once("value", snapshot => {
+    //     if (snapshot.exists()) {
+    //         name = prompt("That playerReference already exists, enter a new name");
+    //         while (name === "" || name === null) {
+    //             name = prompt("If you want to play the game, then you must enter a name");
+    //         }
+    //         ensureUniquePlayerName(name);
+    //     }
+    //     else {
+
+    //         playerReference.set({
+    //             name: name
+    //         });
+
+    //         playerReference.onDisconnect().remove();
+    //     }
+    
+    // }).catch(error => {
+    //     console.log("Uh oh... there has been an error");
+    //     console.log(error);
+    // });
 }
