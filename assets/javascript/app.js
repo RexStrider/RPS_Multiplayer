@@ -74,7 +74,7 @@ let player;
 let name = prompt("What's your name?");
 
 console.log(name);
-while (name == "") {
+while (name === "" || name === null) {
     name = prompt("Give me a proper name!");
 }
 
@@ -88,6 +88,9 @@ function ensureUniquePlayerName(name) {
         if (snapshot.exists()) {
             console.log("player exists");
             name = prompt("That player already exists, enter a new name");
+            while (name === "" || name === null) {
+                name = prompt("Are you trying to break the game? Just enter a name...");
+            }
             ensureUniquePlayerName(name);
         }
         else {
