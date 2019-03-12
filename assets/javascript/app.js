@@ -37,7 +37,7 @@ let connectionsRef = database.ref("/connections");
 let connectedRef = database.ref(".info/connected");
 
 // When the client's connection state changes...
-connectedRef.on("value", function(snap) {
+connectedRef.on("value", snap => {
 
   // If they are connected..
   if (snap.val()) {
@@ -51,7 +51,7 @@ connectedRef.on("value", function(snap) {
 });
 
 // When first loaded or when the connections list changes...
-connectionsRef.on("value", function(snapshot) {
+connectionsRef.on("value", snapshot => {
 
   // Display the viewer count in the html.
   // The number of online users is the number of children in the connections list.
@@ -68,40 +68,62 @@ connectionsRef.on("value", function(snapshot) {
 });
 
 // -------------------------------------------------------------- (CRITICAL - BLOCK) --------------------------- //
-let name = "player-1";
-let player = database.ref("users/" + name);
+let player;
+// let nameUnavailable = true;
+// while(nameUnavailable) {
+let name = prompt("What's your name?");
 
-let listElements = document.getElementsByTagName("li");
-
-// console.log(listElements);
-
-// console.log(listElements.length);
-
-for (i=0; i < listElements.length; i++) {
-    // console.log(i);
-
-    let element = listElements.item(i);
-
-    // console.log(element);
-
-    element.addEventListener("click", () => {
-
-        let choice = element.getAttribute("data-value");
-
-        console.log(choice);
-
-        // save choice to database
-        player.set({
-            choice: choice
-        })
-
-        // save choice to database
-        // wait for another choice
-
-        // or 
-
-        // check database for choice
-        // if choice exists, compare to current choice
-        // determine a winner
-    });
+console.log(name);
+while (name == "") {
+    name = prompt("Give me a proper name!");
 }
+player = database.ref("users/" + name);
+
+player.once("value", snapshot => {
+    
+    if (snapshot.exists()) {
+        console.log("player exists")
+    }
+    else {
+        console.log("player name available")
+        // nameUnavailable = false;
+    }
+
+}).then(() => {
+    
+});
+// }
+// let listElements = document.getElementsByTagName("li");
+
+// // console.log(listElements);
+
+// // console.log(listElements.length);
+
+// for (i=0; i < listElements.length; i++) {
+//     // console.log(i);
+
+//     let element = listElements.item(i);
+
+//     // console.log(element);
+
+//     element.addEventListener("click", () => {
+
+//         let choice = element.getAttribute("data-value");
+
+//         console.log(choice);
+
+//         // save choice to database
+//         player.set({
+//             choice: choice
+//         })
+
+//         // save choice to database
+//         // wait for another choice
+
+//         // or 
+
+//         // check database for choice
+//         // if choice exists, compare to current choice
+//         // determine a winner
+//     });
+// }
