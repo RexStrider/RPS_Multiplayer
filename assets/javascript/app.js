@@ -77,53 +77,81 @@ console.log(name);
 while (name == "") {
     name = prompt("Give me a proper name!");
 }
-player = database.ref("users/" + name);
 
-player.once("value", snapshot => {
+ensureUniquePlayerName(name);
+
+function ensureUniquePlayerName(name) {
+    player = database.ref("users/" + name);
     
-    if (snapshot.exists()) {
-        console.log("player exists")
-    }
-    else {
-        console.log("player name available")
-        // nameUnavailable = false;
-    }
-
-}).then(() => {
+    player.once("value", snapshot => {
     
-});
-// }
-// let listElements = document.getElementsByTagName("li");
+        if (snapshot.exists()) {
+            console.log("player exists");
+            name = prompt("That player already exists, enter a new name");
+            ensureUniquePlayerName(name);
+        }
+        else {
+            console.log("player name available");
+            // nameUnavailable = false;
+            player.set({
+                name: name
+            });
+            player.onDisconnect().remove();
+        }
+    
+    }).catch(error => {
+        console.log("Uh oh... there has been an error");
+        console.log(error);
+    });
+}
 
-// // console.log(listElements);
 
-// // console.log(listElements.length);
+let listElements = document.getElementsByTagName("li");
 
-// for (i=0; i < listElements.length; i++) {
-//     // console.log(i);
+// console.log(listElements);
 
-//     let element = listElements.item(i);
+// console.log(listElements.length);
 
-//     // console.log(element);
+for (i=0; i < listElements.length; i++) {
+    // console.log(i);
 
-//     element.addEventListener("click", () => {
+    let element = listElements.item(i);
 
-//         let choice = element.getAttribute("data-value");
+    // console.log(element);
 
-//         console.log(choice);
+    element.addEventListener("click", () => {
 
-//         // save choice to database
-//         player.set({
-//             choice: choice
-//         })
+        let choice = element.getAttribute("data-value");
 
-//         // save choice to database
-//         // wait for another choice
+        console.log(choice);
 
-//         // or 
+        // save choice to database
+        player.set({
+            name: name,
+            choice: choice
+        }).then(() => {
 
-//         // check database for choice
-//         // if choice exists, compare to current choice
-//         // determine a winner
-//     });
-// }
+            let users = database.ref("users");
+
+            console.log(users);
+            // console.log(users.val());
+            users.on("value", snapshot => {
+                console.log(snapshot.val());
+            })
+
+            // users.once("value", snapshot => {
+
+            // })
+
+        })
+
+        // save choice to database
+        // wait for another choice
+
+        // or 
+
+        // check database for choice
+        // if choice exists, compare to current choice
+        // determine a winner
+    });
+}
