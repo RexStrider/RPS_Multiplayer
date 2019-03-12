@@ -69,59 +69,20 @@ connectionsRef.on("value", snapshot => {
 
 // -------------------------------------------------------------- (CRITICAL - BLOCK) --------------------------- //
 let player;
-// let nameUnavailable = true;
-// while(nameUnavailable) {
 let name = prompt("What's your name?");
-
-console.log(name);
 while (name === "" || name === null) {
     name = prompt("Give me a proper name!");
 }
-
 ensureUniquePlayerName(name);
 
-function ensureUniquePlayerName(name) {
-    player = database.ref("users/" + name);
-    
-    player.once("value", snapshot => {
-    
-        if (snapshot.exists()) {
-            console.log("player exists");
-            name = prompt("That player already exists, enter a new name");
-            while (name === "" || name === null) {
-                name = prompt("If you want to play the game, then you must enter a name");
-            }
-            ensureUniquePlayerName(name);
-        }
-        else {
-            console.log("player name available");
-            // nameUnavailable = false;
-            player.set({
-                name: name
-            });
-            player.onDisconnect().remove();
-        }
-    
-    }).catch(error => {
-        console.log("Uh oh... there has been an error");
-        console.log(error);
-    });
-}
+
 
 
 let listElements = document.getElementsByTagName("li");
 
-// console.log(listElements);
-
-// console.log(listElements.length);
-
 for (i=0; i < listElements.length; i++) {
-    // console.log(i);
 
     let element = listElements.item(i);
-
-    // console.log(element);
-
     element.addEventListener("click", () => {
 
         let choice = element.getAttribute("data-value");
@@ -156,5 +117,29 @@ for (i=0; i < listElements.length; i++) {
         // check database for choice
         // if choice exists, compare to current choice
         // determine a winner
+    });
+}
+
+function ensureUniquePlayerName(name) {
+    player = database.ref("users/" + name);
+    player.once("value", snapshot => {
+        if (snapshot.exists()) {
+            name = prompt("That player already exists, enter a new name");
+            while (name === "" || name === null) {
+                name = prompt("If you want to play the game, then you must enter a name");
+            }
+            ensureUniquePlayerName(name);
+        }
+        else {
+
+            player.set({
+                name: name
+            });
+            player.onDisconnect().remove();
+        }
+    
+    }).catch(error => {
+        console.log("Uh oh... there has been an error");
+        console.log(error);
     });
 }
