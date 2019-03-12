@@ -107,19 +107,70 @@ firebaseConnectionEstablished.then( num => {
                     let users = database.ref("users");
 
                     console.log(users);
-                    // console.log(users.val());
+                    
                     users.on("value", snapshot => {
-                        console.log(snapshot);
 
                         console.log(snapshot.val());
 
                         // let playerReferences = snapshot.val();
 
-                        if (num > 1) {
+                        let numOfPlayers = snapshot.numChildren();
+
+                        // console.log(typeof(numOfPlayers));
+
+                        if (numOfPlayers < 2) {
+                            console.log("waiting for a challenger...");
+                        }
+                        else if (numOfPlayers == 2) {
                             console.log("we have a challenger");
+
+                            let playerOne = database.ref("users/player-1");
+                            let playerTwo = database.ref("users/player-2");
+
+                            // get value of player one
+                            // then get value of player two
+                            
+
+                            let yourChoice;
+                            let theirChoice;
+
+                            console.log("current " + name);
+                            console.log("one " + playerOne.name);
+                            console.log("two " + playerTwo.name);
+
+
+                            if (name === playerOne.name) {
+                                yourChoice = playerOne.choice;
+                                theirChoice = playerTwo.choice;
+                            }
+                            else if (name === playerTwo.name) {
+                                theirChoice = playerOne.choice;
+                                yourChoice = playerTwo.choice;
+                            }
+                            else {
+                                console.log("There were more than three players? That's one too many!");
+                                alert("I'm sorry, but due to the limitations of the programmer, we will not be able to handle your request... check the console for more details");
+                            }
+
+                            if ( (yourChoice === 'r' && theirChoice === 's')
+                              || (yourChoice === 's' && theirChoice === 'p')
+                              || (yourChoice === 'p' && theirChoice === 'r')) {
+                                console.log("You win!");
+                                alert("You win! Congratulations " + name);
+                            }
+                            else if ( (yourChoice === 'r' && theirChoice === 'p')
+                                   || (yourChoice === 's' && theirChoice === 'r')
+                                   || (yourChoice === 'p' && theirChoice === 's')) {
+                                console.log("You lose!");
+                                alert("You lose! Sorry " + name);
+                            }
+                            else {
+                                console.log("You tied...");
+                                alert("You tied... better luck next time");
+                            }
                         }
                         else {
-                            console.log("wating for a challenger...");
+                            console.log("A duel is commencing, please wait for your turn");
                         }
                     })
 
