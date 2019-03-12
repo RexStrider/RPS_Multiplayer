@@ -89,7 +89,7 @@ function ensureUniquePlayerName(name) {
             console.log("player exists");
             name = prompt("That player already exists, enter a new name");
             while (name === "" || name === null) {
-                name = prompt("Are you trying to break the game? Just enter a name...");
+                name = prompt("If you want to play the game, then you must enter a name");
             }
             ensureUniquePlayerName(name);
         }
