@@ -16,11 +16,11 @@ let database = firebase.database();
 
 // * Only two users can play at the same time.
 
-// * Both playerReferences pick either `rock`, `paper` or `scissors`. After the playerReferences make their selection, the game will tell them whether a tie occurred or if one playerReference defeated the other.
+// * Both choiceRefs pick either `rock`, `paper` or `scissors`. After the choiceRefs make their selection, the game will tell them whether a tie occurred or if one choiceRef defeated the other.
 
-// * The game will track each playerReference's wins and losses.
+// * The game will track each choiceRef's wins and losses.
 
-// * Throw some chat functionality in there! No online multiplayerReference game is complete without having to endure endless taunts and insults from your jerk opponent.
+// * Throw some chat functionality in there! No online multichoiceRef game is complete without having to endure endless taunts and insults from your jerk opponent.
 
 // * Styling and theme are completely up to you. Get Creative!
 
@@ -74,16 +74,22 @@ let firebaseConnectionEstablished = new Promise( (resolve, reject) => {
 });
 
 // -------------------------------------------------------------- (CRITICAL - BLOCK) --------------------------- //
-let playerReference;
-let name = prompt("What's your name?");
-while (name === "" || name === null) {
-    name = prompt("Give me a proper name!");
-}
+let name;
 
-firebaseConnectionEstablished.then( num => {
+let nameRef;
+let choiceRef;
+
+firebaseConnectionEstablished.then( () => {
+
+    name = prompt("What's your name?");
+    while (name === "" || name === null) {
+        name = prompt("Give me a proper name!");
+    }
+
     let playerIsSet = new Promise((resolve, reject) => {
-        setPlayer(name, num);
-        resolve();
+        setPlayer();
+        // console.log("during FCE: " + name);
+        resolve(name);
     });
     
     playerIsSet.then( () => {
@@ -96,83 +102,89 @@ firebaseConnectionEstablished.then( num => {
 
                 let choice = element.getAttribute("data-value");
 
-                console.log(choice);
+                // console.log(choice);
 
                 // save choice to database
-                playerReference.set({
+                choiceRef.set({
                     name: name,
                     choice: choice
                 }).then(() => {
 
-                    let users = database.ref("users");
+                    let userChoices = database.ref("users/choice");
 
-                    console.log(users);
+                    // console.log(users);
+
+                    userChoices.orderByChild("choice").on("child_added", function(data) {
+                        console.log(data.val().name + " | " + data.val().choice);
+                     });
                     
-                    users.on("value", snapshot => {
+                    // users.on("value", snapshot => {
 
-                        console.log(snapshot.val());
+                    //     console.log(snapshot.val());
 
-                        // let playerReferences = snapshot.val();
 
-                        let numOfPlayers = snapshot.numChildren();
+
+                        // let choiceRefs = snapshot.val();
+
+                        // let numOfPlayers = snapshot.numChildren();
 
                         // console.log(typeof(numOfPlayers));
 
-                        if (numOfPlayers < 2) {
-                            console.log("waiting for a challenger...");
-                        }
-                        else if (numOfPlayers == 2) {
-                            console.log("we have a challenger");
+                        // if (numOfPlayers < 2) {
+                        //     console.log("waiting for a challenger...");
+                        // }
+                        // else if (numOfPlayers == 2) {
+                        //     console.log("we have a challenger");
 
-                            let playerOne = database.ref("users/player-1");
-                            let playerTwo = database.ref("users/player-2");
+                        //     let playerOne = database.ref("users/player-1");
+                        //     let playerTwo = database.ref("users/player-2");
 
-                            // get value of player one
-                            // then get value of player two
+                        //     // get value of player one
+                        //     // then get value of player two
                             
 
-                            let yourChoice;
-                            let theirChoice;
+                        //     let yourChoice;
+                        //     let theirChoice;
 
-                            console.log("current " + name);
-                            console.log("one " + playerOne.name);
-                            console.log("two " + playerTwo.name);
+                        //     console.log("current " + name);
+                        //     console.log("one " + playerOne.name);
+                        //     console.log("two " + playerTwo.name);
 
 
-                            if (name === playerOne.name) {
-                                yourChoice = playerOne.choice;
-                                theirChoice = playerTwo.choice;
-                            }
-                            else if (name === playerTwo.name) {
-                                theirChoice = playerOne.choice;
-                                yourChoice = playerTwo.choice;
-                            }
-                            else {
-                                console.log("There were more than three players? That's one too many!");
-                                alert("I'm sorry, but due to the limitations of the programmer, we will not be able to handle your request... check the console for more details");
-                            }
+                        //     if (name === playerOne.name) {
+                        //         yourChoice = playerOne.choice;
+                        //         theirChoice = playerTwo.choice;
+                        //     }
+                        //     else if (name === playerTwo.name) {
+                        //         theirChoice = playerOne.choice;
+                        //         yourChoice = playerTwo.choice;
+                        //     }
+                        //     else {
+                        //         console.log("There were more than three players? That's one too many!");
+                        //         alert("I'm sorry, but due to the limitations of the programmer, we will not be able to handle your request... check the console for more details");
+                        //     }
 
-                            if ( (yourChoice === 'r' && theirChoice === 's')
-                              || (yourChoice === 's' && theirChoice === 'p')
-                              || (yourChoice === 'p' && theirChoice === 'r')) {
-                                console.log("You win!");
-                                alert("You win! Congratulations " + name);
-                            }
-                            else if ( (yourChoice === 'r' && theirChoice === 'p')
-                                   || (yourChoice === 's' && theirChoice === 'r')
-                                   || (yourChoice === 'p' && theirChoice === 's')) {
-                                console.log("You lose!");
-                                alert("You lose! Sorry " + name);
-                            }
-                            else {
-                                console.log("You tied...");
-                                alert("You tied... better luck next time");
-                            }
-                        }
-                        else {
-                            console.log("A duel is commencing, please wait for your turn");
-                        }
-                    })
+                        //     if ( (yourChoice === 'r' && theirChoice === 's')
+                        //       || (yourChoice === 's' && theirChoice === 'p')
+                        //       || (yourChoice === 'p' && theirChoice === 'r')) {
+                        //         console.log("You win!");
+                        //         alert("You win! Congratulations " + name);
+                        //     }
+                        //     else if ( (yourChoice === 'r' && theirChoice === 'p')
+                        //            || (yourChoice === 's' && theirChoice === 'r')
+                        //            || (yourChoice === 'p' && theirChoice === 's')) {
+                        //         console.log("You lose!");
+                        //         alert("You lose! Sorry " + name);
+                        //     }
+                        //     else {
+                        //         console.log("You tied...");
+                        //         alert("You tied... better luck next time");
+                        //     }
+                        // }
+                        // else {
+                        //     console.log("A duel is commencing, please wait for your turn");
+                        // }
+                    // })
 
                     // users.once("value", snapshot => {
 
@@ -214,7 +226,7 @@ firebaseConnectionEstablished.then( num => {
 //         console.log(choice);
 
 //         // save choice to database
-//         playerReference.set({
+//         choiceRef.set({
 //             name: name,
 //             choice: choice
 //         }).then(() => {
@@ -228,9 +240,9 @@ firebaseConnectionEstablished.then( num => {
 
 //                 console.log(snapshot.val());
 
-//                 let playerReferences = snapshot.val();
+//                 let choiceRefs = snapshot.val();
 
-//                 if (playerReference.length > 1) {
+//                 if (choiceRef.length > 1) {
 //                     console.log("we have a challenger");
 //                 }
 //                 else {
@@ -255,37 +267,40 @@ firebaseConnectionEstablished.then( num => {
 //     });
 // }
 
-function setPlayer(name, num) {
-    playerReference = database.ref("users/player-"+num);
+function setPlayer() {
+    nameRef = database.ref("users/"+name)
+    choiceRef = database.ref("users/choice/"+name);
 
-    playerReference.set({
-        name: name
-    }).catch(error => {
-        console.log("Uh oh... there has been an error");
-        console.log(error);
-    });
-
-    playerReference.onDisconnect().remove();
-
-    // playerReference.once("value", snapshot => {
-    //     if (snapshot.exists()) {
-    //         name = prompt("That playerReference already exists, enter a new name");
-    //         while (name === "" || name === null) {
-    //             name = prompt("If you want to play the game, then you must enter a name");
-    //         }
-    //         ensureUniquePlayerName(name);
-    //     }
-    //     else {
-
-    //         playerReference.set({
-    //             name: name
-    //         });
-
-    //         playerReference.onDisconnect().remove();
-    //     }
-    
+    // choiceRef.set({
+    //     name: name
     // }).catch(error => {
     //     console.log("Uh oh... there has been an error");
     //     console.log(error);
     // });
+
+    // choiceRef.onDisconnect().remove();
+
+    nameRef.once("value", snapshot => {
+        if (snapshot.exists()) {
+            name = prompt("That name already exists, enter a new name");
+            while (name === "" || name === null) {
+                name = prompt("If you want to play the game, then you must enter a name");
+            }
+            setPlayer(name);
+        }
+        else {
+
+            nameRef.set({
+                name: name
+            });
+
+            // removes user name and user's choice on disconnect
+            nameRef.onDisconnect().remove();
+            choiceRef.onDisconnect().remove();
+        }
+    
+    }).catch(error => {
+        console.log("Uh oh... there has been an error");
+        console.log(error);
+    });
 }
