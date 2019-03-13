@@ -79,6 +79,8 @@ let name;
 let nameRef;
 let choiceRef;
 
+let duelers = [];
+
 firebaseConnectionEstablished.then( () => {
 
     name = prompt("What's your name?");
@@ -111,95 +113,31 @@ firebaseConnectionEstablished.then( () => {
                 }).then(() => {
 
                     let userChoices = database.ref("users/choice");
-
-                    // console.log(users);
-
-                    userChoices.orderByChild("choice").on("child_added", function(data) {
-                        console.log(data.val().name + " | " + data.val().choice);
-                     });
                     
-                    // users.on("value", snapshot => {
+                    userChoices.on("child_added", function(data) {
 
-                    //     console.log(snapshot.val());
+                        console.log(data.val());
 
+                        duelers.push(data.val());
 
+                        console.log(duelers);
 
-                        // let choiceRefs = snapshot.val();
-
-                        // let numOfPlayers = snapshot.numChildren();
-
-                        // console.log(typeof(numOfPlayers));
-
-                        // if (numOfPlayers < 2) {
-                        //     console.log("waiting for a challenger...");
-                        // }
-                        // else if (numOfPlayers == 2) {
-                        //     console.log("we have a challenger");
-
-                        //     let playerOne = database.ref("users/player-1");
-                        //     let playerTwo = database.ref("users/player-2");
-
-                        //     // get value of player one
-                        //     // then get value of player two
+                        if (duelers.length > 1) {
+                            console.log("it's go time!");
                             
+                            if (duelers[0].name === name) {
+                                determineWinner(duelers[0].choice, duelers[1].choice);
+                            }
+                            else if(duelers[1].name === name) {
+                                determineWinner(duelers[1].choice, duelers[0].choice);
+                            }
+                            else {
+                                console.log("sorry "+name+", better wait your turn...");
+                            }
 
-                        //     let yourChoice;
-                        //     let theirChoice;
-
-                        //     console.log("current " + name);
-                        //     console.log("one " + playerOne.name);
-                        //     console.log("two " + playerTwo.name);
-
-
-                        //     if (name === playerOne.name) {
-                        //         yourChoice = playerOne.choice;
-                        //         theirChoice = playerTwo.choice;
-                        //     }
-                        //     else if (name === playerTwo.name) {
-                        //         theirChoice = playerOne.choice;
-                        //         yourChoice = playerTwo.choice;
-                        //     }
-                        //     else {
-                        //         console.log("There were more than three players? That's one too many!");
-                        //         alert("I'm sorry, but due to the limitations of the programmer, we will not be able to handle your request... check the console for more details");
-                        //     }
-
-                        //     if ( (yourChoice === 'r' && theirChoice === 's')
-                        //       || (yourChoice === 's' && theirChoice === 'p')
-                        //       || (yourChoice === 'p' && theirChoice === 'r')) {
-                        //         console.log("You win!");
-                        //         alert("You win! Congratulations " + name);
-                        //     }
-                        //     else if ( (yourChoice === 'r' && theirChoice === 'p')
-                        //            || (yourChoice === 's' && theirChoice === 'r')
-                        //            || (yourChoice === 'p' && theirChoice === 's')) {
-                        //         console.log("You lose!");
-                        //         alert("You lose! Sorry " + name);
-                        //     }
-                        //     else {
-                        //         console.log("You tied...");
-                        //         alert("You tied... better luck next time");
-                        //     }
-                        // }
-                        // else {
-                        //     console.log("A duel is commencing, please wait for your turn");
-                        // }
-                    // })
-
-                    // users.once("value", snapshot => {
-
-                    // })
-
+                        }
+                     })
                 })
-
-                // save choice to database
-                // wait for another choice
-
-                // or 
-
-                // check database for choice
-                // if choice exists, compare to current choice
-                // determine a winner
             });
         }
     }).catch( error => {
@@ -210,75 +148,10 @@ firebaseConnectionEstablished.then( () => {
 });
 
 
-// players.push(name);
-
-
-
-// let listElements = document.getElementsByTagName("li");
-
-// for (i=0; i < listElements.length; i++) {
-
-//     let element = listElements.item(i);
-//     element.addEventListener("click", () => {
-
-//         let choice = element.getAttribute("data-value");
-
-//         console.log(choice);
-
-//         // save choice to database
-//         choiceRef.set({
-//             name: name,
-//             choice: choice
-//         }).then(() => {
-
-//             let users = database.ref("users");
-
-//             console.log(users);
-//             // console.log(users.val());
-//             users.on("value", snapshot => {
-//                 console.log(snapshot);
-
-//                 console.log(snapshot.val());
-
-//                 let choiceRefs = snapshot.val();
-
-//                 if (choiceRef.length > 1) {
-//                     console.log("we have a challenger");
-//                 }
-//                 else {
-//                     console.log("wating for a challenger...");
-//                 }
-//             })
-
-//             // users.once("value", snapshot => {
-
-//             // })
-
-//         })
-
-//         // save choice to database
-//         // wait for another choice
-
-//         // or 
-
-//         // check database for choice
-//         // if choice exists, compare to current choice
-//         // determine a winner
-//     });
-// }
 
 function setPlayer() {
     nameRef = database.ref("users/"+name)
     choiceRef = database.ref("users/choice/"+name);
-
-    // choiceRef.set({
-    //     name: name
-    // }).catch(error => {
-    //     console.log("Uh oh... there has been an error");
-    //     console.log(error);
-    // });
-
-    // choiceRef.onDisconnect().remove();
 
     nameRef.once("value", snapshot => {
         if (snapshot.exists()) {
@@ -294,7 +167,6 @@ function setPlayer() {
                 name: name
             });
 
-            // removes user name and user's choice on disconnect
             nameRef.onDisconnect().remove();
             choiceRef.onDisconnect().remove();
         }
@@ -303,4 +175,30 @@ function setPlayer() {
         console.log("Uh oh... there has been an error");
         console.log(error);
     });
+}
+
+function determineWinner(you, them) {
+    if ( (you === 'r' && them === 's')
+      || (you === 's' && them === 'p')
+      || (you === 'p' && them === 'r')) {
+        console.log("You win!");
+        // alert("You win! Congratulations " + name);
+
+        document.getElementById("rps").innerHTML = "<p>Congratulations " + name + ", you won!</p>";
+    }
+    else if ( (you === 'r' && them === 'p')
+           || (you === 's' && them === 'r')
+           || (you === 'p' && them === 's')) {
+        console.log("You lose!");
+        // alert("You lose! Sorry " + name);
+        document.getElementById("rps").innerHTML = "<p>Boo " + name + ", you stink!</p>";
+    }
+    else {
+        console.log("You tied...");
+        // alert("You tied... better luck next time");
+        document.getElementById("rps").innerHTML = "<p>You tied? how anti-climatic... better luck nex time!</p>";
+    }
+
+    console.log("goodbye "+duelers.pop().name + "!");
+    console.log("farewell "+duelers.pop().name + "!");
 }
