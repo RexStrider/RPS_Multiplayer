@@ -15,6 +15,8 @@ let player = {
     name: "",
     choice: "",
 
+    intervalId: null,
+
     getPlayerName: () => {
         document.getElementById("user-info").innerHTML = "";
 
@@ -41,15 +43,20 @@ let player = {
             document.getElementById("submit").removeEventListener("click", submitEvent);
             
             this.name = document.getElementById("input-name").value;
-            console.log(this.name);
 
             if (this.name === "" || this.name == null) {
                 document.getElementById("user-prompt").textContent = "That's not a name. Please enter a name "
+            }
+            else {
+                document.getElementById("user-info").innerHTML = "<p>You did it! Your new name is '<span class='bold'>" + this.name + "</span>'.</p>";
+                player.countDown();
             }
 
             let count = 0;
             document.getElementById("submit").addEventListener("click", function submitEvent2(event) {
                 event.preventDefault();
+
+                this.name = document.getElementById("input-name").value;
 
                 let tries = 5;
                 if ((this.name === "" || this.name == null) && count < tries) {
@@ -60,20 +67,37 @@ let player = {
                     document.getElementById("submit").removeEventListener("click", submitEvent2);
                     this.name = Math.random().toString(36).replace('0.', '').substr(0, 8);
                     document.getElementById("user-info").innerHTML = "<p>Fine, I'll pick a name for you... Your new name is '<span class='bold'>" + this.name + "</span>'. You're welcome...</p>";
+                    player.countDown();
                 }
                 else {
                     document.getElementById("submit").removeEventListener("click", submitEvent2);
                     document.getElementById("user-info").innerHTML = "<p>You did it! Your new name is '<span class='bold'>" + this.name + "</span>'.</p>";
+                    player.countDown();
                 }
-
-                // console.log(this.name);
-                // console.log(this.name === "" || this.name == null);
-                // console.log((this.name === "" || this.name == null) && count < 5);
-                // console.log((this.name === "" || this.name == null) && count >= 5);
             });
         });
+    },
+
+    countDown: () => {
+        let count = 5;
+        let intervalId = setInterval(() => {
+            if (count > 0) {
+                document.getElementById("rps").innerHTML = "<p>"+count+" seconds left</p>"
+                count--;
+            }
+            else {
+                document.getElementById("rps").innerHTML = "<p>Times up!</p>"
+                clearInterval(intervalId);
+                player.startGame();
+            }
+        }, 1000);
+    },
+
+    startGame: () => {
+        console.log("Game start!");
     }
 }
 
 player.getPlayerName();
 
+// after getting player name, then we must start the game
