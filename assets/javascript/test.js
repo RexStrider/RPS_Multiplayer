@@ -115,6 +115,29 @@ let player = {
         ul.append(rock, paper, scissors);
 
         document.getElementById("rps").append(ul);
+
+        rock.addEventListener("click", () => {
+            saishoWaGuujankenPo("rock");
+        });
+
+        paper.addEventListener("click", () => {
+            saishoWaGuujankenPo("paper");
+        });
+
+        scissors.addEventListener("click", () => {
+            saishoWaGuujankenPo("scissors");
+        });
+    },
+
+    // This function handles the storing of the move thrown both locally and in the firebase backend
+    // It is named after the Japanese ritual performed before playing rock, paper, scissors
+    // If you still don't understand the name, look into the Hunter x Hunter anime or wikipedia...
+    saishoWaGuujankenPo: throwMove => {
+        player.choice = throwMove;
+
+        database.ref("Janken/" + player.name).set({
+            choice: throwMove
+        });
     }
 }
 
