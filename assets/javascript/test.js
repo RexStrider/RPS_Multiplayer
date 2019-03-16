@@ -45,7 +45,7 @@ let player = {
             this.name = document.getElementById("input-name").value;
 
             if (this.name === "" || this.name == null) {
-                document.getElementById("user-prompt").textContent = "That's not a name. Please enter a name "
+                document.getElementById("user-prompt").textContent = "That's not a name. Please enter a name ";
             }
             else {
                 document.getElementById("user-info").innerHTML = "<p>You did it! Your new name is '<span class='bold'>" + this.name + "</span>'.</p>";
@@ -60,7 +60,7 @@ let player = {
 
                 let tries = 5;
                 if ((this.name === "" || this.name == null) && count < tries) {
-                    document.getElementById("user-prompt").textContent = "Are you even trying? You have " + (tries - count) + " more tries to pick a name "
+                    document.getElementById("user-prompt").textContent = "Are you even trying? You have " + (tries - count) + " more tries to pick a name ";
                     count++;
                 }
                 else if ((this.name === "" || this.name == null) && count >= tries) {
@@ -82,11 +82,11 @@ let player = {
         let count = 5;
         let intervalId = setInterval(() => {
             if (count > 0) {
-                document.getElementById("rps").innerHTML = "<p>"+count+" seconds left</p>"
+                document.getElementById("rps").innerHTML = "<p>"+count+" seconds left</p>";
                 count--;
             }
             else {
-                document.getElementById("rps").innerHTML = "<p>Times up!</p>"
+                document.getElementById("rps").innerHTML = "";
                 clearInterval(intervalId);
                 player.startGame();
             }
@@ -95,6 +95,26 @@ let player = {
 
     startGame: () => {
         console.log("Game start!");
+
+        document.getElementById("user-info").innerHTML = "<p>Choose your weapon...</p>";
+
+        let ul = document.createElement("ul");
+
+        let rock = document.createElement("li");
+        let paper = document.createElement("li");
+        let scissors = document.createElement("li");
+
+        rock.setAttribute("id", "rock");
+        paper.setAttribute("id", "paper");
+        scissors.setAttribute("id", "scissors");
+
+        rock.textContent = "Give them the rock!";
+        paper.textContent = "Serve them those papers!";
+        scissors.textContent = "Run with those scissors!";
+
+        ul.append(rock, paper, scissors);
+
+        document.getElementById("rps").append(ul);
     }
 }
 
