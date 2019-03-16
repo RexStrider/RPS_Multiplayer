@@ -135,9 +135,11 @@ let player = {
     saishoWaGuujankenPo: throwMove => {
         player.choice = throwMove;
 
-        database.ref("Janken/" + player.name).set({
+        database.ref("janken/" + player.name).set({
             choice: throwMove
         });
+
+        database.ref("janken/" + player.name).onDisconnect().remove();
     }
 }
 
