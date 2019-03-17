@@ -93,6 +93,8 @@ let player = {
     },
 
     countDown: () => {
+        document.getElementById("rps").innerHTML = "";
+
         let count = 5;
         let intervalId = setInterval(() => {
             if (count > 0) {
@@ -161,6 +163,7 @@ let player = {
 
         // check database for other players
         database.ref("janken").on("child_added", data => {
+            // document.getElementById("rps").innerHTML = "";
             // console.log(data.val());
 
             let opponent = data.val();
@@ -180,6 +183,7 @@ let player = {
                     p3.textContent = opponent.name + " chose " + opponent.choice;
 
                     document.getElementById("user-info").innerHTML = "";
+                    // document.getElementById("rps").innerHTML = "";
                     document.getElementById("rps").append(p1, p2, p3);
                 }
                 else if ((player.choice == "rock" && opponent.choice == "paper")
@@ -196,6 +200,7 @@ let player = {
                     p3.textContent = opponent.name + " chose " + opponent.choice;
 
                     document.getElementById("user-info").innerHTML = "";
+                    // document.getElementById("rps").innerHTML = "";
                     document.getElementById("rps").append(p1, p2, p3);
                 }
                 else {
@@ -210,10 +215,21 @@ let player = {
                     p3.textContent = opponent.name + " chose " + opponent.choice;
 
                     document.getElementById("user-info").innerHTML = "";
+                    // document.getElementById("rps").innerHTML = "";
                     document.getElementById("rps").append(p1, p2, p3);
                 }
 
                 database.ref("janken/" + player.name).remove();
+
+                let button = document.createElement("button");
+                // button.setAttribute("id", "new-game-button");
+                button.textContent = "New Game";
+
+                button.addEventListener("click", player.countDown)
+
+                // document.getElementById("new-game").innerHTML = "";
+                document.getElementById("rps").append(button);
+                database.ref("janken").off();
             }
         });
     }
