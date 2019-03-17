@@ -52,10 +52,9 @@ let player = {
             }
             else {
                 document.getElementById("user-info").innerHTML = "<p>Awesome, your name is '<span class='bold'>" + player.name + "</span>'.</p>";
-                database.ref("janken/" + player.name).set({
+                database.ref("player").push({
                     name: player.name,
-                });
-                database.ref("janken/" + player.name).onDisconnect().remove();
+                }).onDisconnect().remove();
                 player.countDown();
             }
 
@@ -75,19 +74,17 @@ let player = {
                         document.getElementById("submit").removeEventListener("click", submitEvent2);
                         player.name = Math.random().toString(36).replace('0.', '').substr(0, 8);
                         document.getElementById("user-info").innerHTML = "<p>Fine, I'll pick a name for you... Your new name is '<span class='bold'>" + player.name + "</span>'. You're welcome...</p>";
-                        database.ref("janken/" + player.name).set({
+                        database.ref("player").push({
                             name: player.name,
-                        });
-                        database.ref("janken/" + player.name).onDisconnect().remove();
+                        }).onDisconnect().remove();
                         player.countDown();
                     }
                     else {
                         document.getElementById("submit").removeEventListener("click", submitEvent2);
                         document.getElementById("user-info").innerHTML = "<p>Ok, your name is '<span class='bold'>" + player.name + "</span>'.</p>";
-                        database.ref("janken/" + player.name).set({
+                        database.ref("player").push({
                             name: player.name,
-                        });
-                        database.ref("janken/" + player.name).onDisconnect().remove();
+                        }).onDisconnect().remove();
                         player.countDown();
                     }
                 });
@@ -156,6 +153,7 @@ let player = {
             name: player.name,
             choice: throwMove
         });
+        database.ref("janken/" + player.name).onDisconnect().remove();
 
         // database.ref("janken/" + player.name).onDisconnect().remove();
         document.getElementById("user-info").innerHTML = "<p>One moment please...</p>";
@@ -168,7 +166,7 @@ let player = {
             let opponent = data.val();
 
             if (opponent.name != player.name && data.hasChild("choice")) {
-                if ((player.choice == "rock" && opponent.chioce == "scissors")
+                if ((player.choice == "rock" && opponent.choice == "scissors")
                 || (player.choice == "scissors" && opponent.choice == "paper")
                 || (player.choice == "paper" && opponent.choice == "rock")) {
                     console.log ("you win " + player.name);
@@ -184,7 +182,7 @@ let player = {
                     document.getElementById("user-info").innerHTML = "";
                     document.getElementById("rps").append(p1, p2, p3);
                 }
-                else if ((player.choice == "rock" && opponent.chioce == "paper")
+                else if ((player.choice == "rock" && opponent.choice == "paper")
                 || (player.choice == "scissors" && opponent.choice == "rock")
                 || (player.choice == "paper" && opponent.choice == "scissors")) {
                     console.log ("you lose " + player.name);
