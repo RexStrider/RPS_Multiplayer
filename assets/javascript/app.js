@@ -212,6 +212,8 @@ let player = {
                     document.getElementById("user-info").innerHTML = "";
                     document.getElementById("rps").append(p1, p2, p3);
                 }
+
+                database.ref("janken/" + player.name).remove();
             }
         });
     }
