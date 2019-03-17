@@ -156,7 +156,7 @@ let player = {
         database.ref("janken/" + player.name).onDisconnect().remove();
 
         // database.ref("janken/" + player.name).onDisconnect().remove();
-        document.getElementById("user-info").innerHTML = "<p>Please waiting for a new challenger...</p>";
+        document.getElementById("user-info").innerHTML = "<p>Please wait for a new challenger...</p>";
         document.getElementById("rps").innerHTML = "";
 
         // check database for other players
