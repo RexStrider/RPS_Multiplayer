@@ -42,39 +42,56 @@ let player = {
 
             document.getElementById("submit").removeEventListener("click", submitEvent);
             
-            this.name = document.getElementById("input-name").value;
+            player.name = document.getElementById("input-name").value;
 
-            if (this.name === "" || this.name == null) {
+            let falseName = false;
+
+            if (player.name === "" || player.name == null) {
                 document.getElementById("user-prompt").textContent = "That's not a name. Please enter a name ";
+                falseName = true;
             }
             else {
-                document.getElementById("user-info").innerHTML = "<p>You did it! Your new name is '<span class='bold'>" + this.name + "</span>'.</p>";
+                document.getElementById("user-info").innerHTML = "<p>Awesome, your name is '<span class='bold'>" + player.name + "</span>'.</p>";
+                database.ref("janken/" + player.name).set({
+                    name: player.name,
+                });
+                database.ref("janken/" + player.name).onDisconnect().remove();
                 player.countDown();
             }
 
-            let count = 0;
-            document.getElementById("submit").addEventListener("click", function submitEvent2(event) {
-                event.preventDefault();
+            if (falseName) {
+                let count = 0;
+                document.getElementById("submit").addEventListener("click", function submitEvent2(event) {
+                    event.preventDefault();
 
-                this.name = document.getElementById("input-name").value;
+                    player.name = document.getElementById("input-name").value;
 
-                let tries = 5;
-                if ((this.name === "" || this.name == null) && count < tries) {
-                    document.getElementById("user-prompt").textContent = "Are you even trying? You have " + (tries - count) + " more tries to pick a name ";
-                    count++;
-                }
-                else if ((this.name === "" || this.name == null) && count >= tries) {
-                    document.getElementById("submit").removeEventListener("click", submitEvent2);
-                    this.name = Math.random().toString(36).replace('0.', '').substr(0, 8);
-                    document.getElementById("user-info").innerHTML = "<p>Fine, I'll pick a name for you... Your new name is '<span class='bold'>" + this.name + "</span>'. You're welcome...</p>";
-                    player.countDown();
-                }
-                else {
-                    document.getElementById("submit").removeEventListener("click", submitEvent2);
-                    document.getElementById("user-info").innerHTML = "<p>You did it! Your new name is '<span class='bold'>" + this.name + "</span>'.</p>";
-                    player.countDown();
-                }
-            });
+                    let tries = 5;
+                    if ((player.name === "" || player.name == null) && count < tries) {
+                        document.getElementById("user-prompt").textContent = "That's not a name, you have " + (tries - count) + " more tries to pick a name ";
+                        count++;
+                    }
+                    else if ((player.name === "" || player.name == null) && count >= tries) {
+                        document.getElementById("submit").removeEventListener("click", submitEvent2);
+                        player.name = Math.random().toString(36).replace('0.', '').substr(0, 8);
+                        document.getElementById("user-info").innerHTML = "<p>Fine, I'll pick a name for you... Your new name is '<span class='bold'>" + player.name + "</span>'. You're welcome...</p>";
+                        database.ref("janken/" + player.name).set({
+                            name: player.name,
+                        });
+                        database.ref("janken/" + player.name).onDisconnect().remove();
+                        player.countDown();
+                    }
+                    else {
+                        document.getElementById("submit").removeEventListener("click", submitEvent2);
+                        document.getElementById("user-info").innerHTML = "<p>Ok, your name is '<span class='bold'>" + player.name + "</span>'.</p>";
+                        database.ref("janken/" + player.name).set({
+                            name: player.name,
+                        });
+                        database.ref("janken/" + player.name).onDisconnect().remove();
+                        player.countDown();
+                    }
+                });
+            }
         });
     },
 
@@ -117,29 +134,37 @@ let player = {
         document.getElementById("rps").append(ul);
 
         rock.addEventListener("click", () => {
-            saishoWaGuujankenPo("rock");
+            player.saishoWaGuujankenPo("rock");
         });
 
         paper.addEventListener("click", () => {
-            saishoWaGuujankenPo("paper");
+            player.saishoWaGuujankenPo("paper");
         });
 
         scissors.addEventListener("click", () => {
-            saishoWaGuujankenPo("scissors");
+            player.saishoWaGuujankenPo("scissors");
         });
     },
 
-    // This function handles the storing of the move thrown both locally and in the firebase backend
+    // This function handles the storing of the move thrown, both locally and in the firebase backend
     // It is named after the Japanese ritual performed before playing rock, paper, scissors
     // If you still don't understand the name, look into the Hunter x Hunter anime or wikipedia...
     saishoWaGuujankenPo: throwMove => {
         player.choice = throwMove;
 
         database.ref("janken/" + player.name).set({
+            name: player.name,
             choice: throwMove
         });
 
-        database.ref("janken/" + player.name).onDisconnect().remove();
+        // database.ref("janken/" + player.name).onDisconnect().remove();
+        document.getElementById("user-info").innerHTML = "<p>One moment please...</p>";
+        document.getElementById("rps").innerHTML = "";
+
+        // check database for other players
+        database.ref("janken").on("child_added", data => {
+            console.log(data.val());
+        });
     }
 }
 
